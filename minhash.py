@@ -12,6 +12,7 @@ import sys
 import random
 from sklearn.metrics import jaccard_similarity_score
 import pprint
+import time
 
 shingles = []
 docs = []
@@ -25,7 +26,32 @@ dataFile = "data/dataSet_" + str(numDocs) + ".txt"
 
 arrayIndex = []
 
-print("reading documents")
+
+#Functions
+def sieve_of_eratosthenes(max_integer, start_):
+    sieve = [True for _ in range(max_integer + 1)]
+    sieve[0:1] = [False, False]
+    for start in range(max_integer + 1):
+        if sieve[start]:
+            for i in range(2 * start, max_integer + 1, start):
+                sieve[i] = False
+    primes = []
+    for i in range(start_, max_integer + 1):
+        if sieve[i]:
+            return i
+    return primes
+
+def hasFunction(a,b,m):
+	per = {}
+	for i in range(0,len(m)) :
+		per.setdefault((a*i+b)%next_prime, i)
+	return per
+
+
+
+#Reading documents and creating input matrix
+time_start = time.time()
+print("*******************reading documents***********************")
 with open(dataFile, "rU") as fp:  
 	line = fp.readline().split(" ")
 	cnt = 0
@@ -53,31 +79,19 @@ with open(dataFile, "rU") as fp:
 		line = fp.readline().split(" ")
 		cnt += 1
 
-def sieve_of_eratosthenes(max_integer, start_):
-    sieve = [True for _ in range(max_integer + 1)]
-    sieve[0:1] = [False, False]
-    for start in range(max_integer + 1):
-        if sieve[start]:
-            for i in range(2 * start, max_integer + 1, start):
-                sieve[i] = False
-    primes = []
-    for i in range(start_, max_integer + 1):
-        if sieve[i]:
-            return i
-    return primes
 
 #permutations
 next_prime = sieve_of_eratosthenes(len(shingles)*2,len(shingles)) #Next Prime
+print("Time ", time.time()-time_start, " Seconds")
+print("***********************************************************")
+print("*****************Shingle Universe**************************")
 
-def hasFunction(a,b,m):
-	per = {}
-	for i in range(0,len(m)) :
-		per.setdefault((a*i+b)%next_prime, i)
-	return per
+print(len(arrayIndex))
+print("***********************************************************")
 
-print("making a permutations")
+time_start = time.time()
+print("******************making a permutations********************")
 arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
-print(len(list(arrayIndex)), len(shingles))
 for i in range(0, permutationNumber):
 	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
 	for j in range(0, numDocs*mult):
@@ -87,27 +101,24 @@ for i in range(0, permutationNumber):
 				signatureMatrix[j].append(key)
 				break
 
-def printMatrix(M):
-	for i in range(0, len(M.keys())):
-		for j in range(0, len(M[i])):
-			sys.stdout.write(str(M[i][j])+ " ")
-		print("")
+
 resultMatrix = []
 treshold = 0.5
 
+print("Time ", time.time()-time_start, " Seconds")
+print("***********************************************************")
 
-print("Calculing Results")
-
+print("*****************Calculing Results*************************")
+time_start = time.time()
 for i in range(0, numDocs*mult):
-	aux = []
+	#aux = []
 	for j in range(i+1, numDocs*mult):
 		js = jaccard_similarity_score(signatureMatrix[i], signatureMatrix[j])
 		if(js>= treshold and i != j) :
-			aux.append("docs : " + str(i) + " " + str(j) + " similarity  " + str(js));
-	if aux:
-		resultMatrix.append(aux)
-
-print("results with a treshold equal or greater than 0.5 ")
-print(resultMatrix)
-
+			resultMatrix.append("docs : " + str(i) + " -------> " + str(j) + "         *similarity  " + str(js));
+print("Time ", time.time()-time_start, " Seconds")
+print("***********************************************************")
+print("****results with a treshold equal or greater than 0.5******")
+pprint.pprint(resultMatrix)
+print("***********************************************************")
 
