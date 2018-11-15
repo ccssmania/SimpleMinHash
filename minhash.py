@@ -92,7 +92,7 @@ print("***********************************************************")
 time_start = time.time()
 print("******************making a permutations********************")
 for i in range(0, permutationNumber):
-	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
+	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix.keys()))
 	for j in range(0, numDocs*mult):
 		signatureMatrix.setdefault(j,[])
 		for key, value in arrayIndex.iteritems():
