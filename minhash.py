@@ -13,6 +13,13 @@ import random
 from sklearn.metrics import jaccard_similarity_score
 import pprint
 import time
+import nltk
+from nltk.tokenize import sent_tokenize,word_tokenize
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+
+
+
 
 shingles = []
 docs = []
@@ -25,8 +32,14 @@ signatureMatrix = {}
 dataFile = "data/dataSet_" + str(numDocs) + ".txt"
 
 arrayIndex = []
+stopWords = set(stopwords.words('english'))
 
 
+
+def jaccard_similarity(x, y):
+	intersection_cardinality = len(set(x).intersection(set(y)))
+	union_cardinality = len(set(x).union(set(y)))
+	return intersection_cardinality / float(union_cardinality)
 #Functions
 def sieve_of_eratosthenes(max_integer, start_):
     sieve = [True for _ in range(max_integer + 1)]
@@ -61,19 +74,20 @@ with open(dataFile, "rU") as fp:
 		docs.append(docAux) #saving the doc id
 		del line[0]
 		for index in range(0, len(line) - 2):
-			shingle = line[index] + " " + line[index + 1] + " " + line[index + 2]
-			#print(index, shingle, cnt)
-			#time.sleep(0.1)
-			if(shingle in shingles):
-				
-				ind = shingles.index(shingle)
-				matrix[ind].setdefault(cnt, 1)
-			else:
-				shingles.append(shingle)
-				matrix.setdefault(shinCount, {})
-				matrix[shinCount].setdefault(cnt,1)
-				arrayIndex.append(shinCount)
-				shinCount += 1
+			if(line[index] in stopWords):
+				shingle = line[index] + " " + line[index + 1] + " " + line[index + 2]
+				#print(index, shingle, cnt)
+				#time.sleep(0.1)
+				if(shingle in shingles):
+					
+					ind = shingles.index(shingle)
+					matrix[ind].setdefault(cnt, 1)
+				else:
+					shingles.append(shingle)
+					matrix.setdefault(shinCount, {})
+					matrix[shinCount].setdefault(cnt,1)
+					arrayIndex.append(shinCount)
+					shinCount += 1
 
 			
 		line = fp.readline().split(" ")
