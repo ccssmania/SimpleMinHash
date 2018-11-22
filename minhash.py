@@ -17,7 +17,7 @@ import nltk
 from nltk.tokenize import sent_tokenize,word_tokenize
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-
+from tqdm import tqdm
 
 
 
@@ -25,7 +25,7 @@ shingles = []
 docs = []
 matrix = {}
 mult = 100
-numDocs = 1
+numDocs = 10
 permutationNumber = 100
 signatureMatrix = {}
 
@@ -48,16 +48,14 @@ def sieve_of_eratosthenes(max_integer, start_):
         if sieve[start]:
             for i in range(2 * start, max_integer + 1, start):
                 sieve[i] = False
-    primes = []
     for i in range(start_, max_integer + 1):
         if sieve[i]:
             return i
-    return primes
-
+    return False
 def hasFunction(a,b,m):
 	per = {}
 	for i in range(0,len(m)) :
-		per.setdefault((a*i+b)%next_prime, i)
+		per.setdefault((a*i+b)%next_prime, m[i])
 	return per
 
 
@@ -66,47 +64,39 @@ def hasFunction(a,b,m):
 time_start = time.time()
 print("*******************reading documents***********************")
 with open(dataFile, "rU") as fp:  
-	line = fp.readline().split(" ")
+	lines = fp.read().split("\nt")
 	cnt = 0
-	shinCount = 0
-	while cnt < numDocs * mult:
-		docAux = [cnt,line[0]]
-		docs.append(docAux) #saving the doc id
+	for line in tqdm(lines):
+		line = line.split(" ")
 		del line[0]
 		for index in range(0, len(line) - 2):
 			if(line[index] in stopWords):
 				shingle = line[index] + " " + line[index + 1] + " " + line[index + 2]
 				#print(index, shingle, cnt)
 				#time.sleep(0.1)
-				if(shingle in shingles):
-					
-					ind = shingles.index(shingle)
-					matrix[ind].setdefault(cnt, 1)
+				if matrix.get(shingle):
+					matrix[shingle].setdefault(cnt,1)
 				else:
-					shingles.append(shingle)
-					matrix.setdefault(shinCount, {})
-					matrix[shinCount].setdefault(cnt,1)
-					arrayIndex.append(shinCount)
-					shinCount += 1
+					matrix.setdefault(shingle, {cnt:1})
 
 			
 		line = fp.readline().split(" ")
 		cnt += 1
 
-
+#pprint.pprint(matrix)
 #permutations
-next_prime = sieve_of_eratosthenes(len(shingles)*2,len(shingles)) #Next Prime
+next_prime = sieve_of_eratosthenes(len(matrix)*2,len(matrix)) #Next Prime
 print("Time ", time.time()-time_start, " Seconds")
 print("***********************************************************")
 print("*****************Shingle Universe**************************")
 
-print(len(arrayIndex))
+print(len(matrix))
 print("***********************************************************")
 
 time_start = time.time()
 print("******************making a permutations********************")
-for i in range(0, permutationNumber):
-	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix.keys()))
+for i in tqdm(range(0, permutationNumber)):
+	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
 	for j in range(0, numDocs*mult):
 		signatureMatrix.setdefault(j,[])
 		for key, value in arrayIndex.iteritems():
@@ -114,7 +104,7 @@ for i in range(0, permutationNumber):
 				signatureMatrix[j].append(key)
 				break
 
-
+#pprint.pprint(signatureMatrix)
 resultMatrix = []
 treshold = 0.5
 
@@ -123,7 +113,7 @@ print("***********************************************************")
 
 print("*****************Calculing Results*************************")
 time_start = time.time()
-for i in range(0, numDocs*mult):
+for i in tqdm(range(0, numDocs*mult)):
 	#aux = []
 	for j in range(i+1, numDocs*mult):
 		js = jaccard_similarity_score(signatureMatrix[i], signatureMatrix[j])
