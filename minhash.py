@@ -34,6 +34,7 @@ dataFile = "data/dataSet_" + str(numDocs) + ".txt"
 arrayIndex = []
 stopWords = set(stopwords.words('english'))
 
+time_total = time.time()
 
 
 def jaccard_similarity(x, y):
@@ -57,6 +58,24 @@ def hasFunction(a,b,m):
 	for i in range(0,len(m)) :
 		per.setdefault((a*i+b)%next_prime, m[i])
 	return per
+
+def binarySearch(l,item,init,end):
+	if(len(l) <= 0 or (end-1 == init and l[init] != item)):
+		return False
+	#print("end ", end , "init ", init, " list ",l[init],"item",item, "l", l)
+	if(init >= end): 
+		return False
+	aux = l[init]
+	if((init == len(l) - 1 and item != aux) or  (init == 0 and item != aux)):
+		return False
+	if(aux == item):
+		return init
+	if(item < aux):
+		#print("first")
+		return binarySearch(l,item,int(init/2),init)
+	else:
+		#print("second")
+		return binarySearch(l,item,int((init+end) / 2),end)
 
 
 
@@ -94,7 +113,7 @@ print(len(matrix))
 print("***********************************************************")
 
 time_start = time.time()
-print("******************making a permutations********************")
+print("******************making permutations********************")
 for i in tqdm(range(0, permutationNumber)):
 	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
 	for j in range(0, numDocs*mult):
@@ -125,3 +144,5 @@ print("****results with a treshold equal or greater than 0.5******")
 pprint.pprint(resultMatrix)
 print("***********************************************************")
 
+print("Total Time Execution : ", (time.time() - time_total) /6, " min")
+print("Total of docs with a similarity equal or greater than ", treshold, " : " + str(len(resultMatrix)))
