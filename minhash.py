@@ -144,5 +144,5 @@ print("****results with a treshold equal or greater than 0.5******")
 pprint.pprint(resultMatrix)
 print("***********************************************************")
 
-print("Total Time Execution : ", (time.time() - time_total) /6, " min")
+print("Total Time Execution : ", (time.time() - time_total) /60, " min")
 print("Total of docs with a similarity equal or greater than ", treshold, " : " + str(len(resultMatrix)))
