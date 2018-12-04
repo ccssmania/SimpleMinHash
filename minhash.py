@@ -25,7 +25,7 @@ shingles = []
 docs = []
 matrix = {}
 mult = 100
-numDocs = 10
+numDocs = 1
 permutationNumber = 100
 signatureMatrix = {}
 
@@ -113,7 +113,7 @@ print(len(matrix))
 print("***********************************************************")
 
 time_start = time.time()
-print("******************making permutations********************")
+print("******************making permutations**********************")
 for i in tqdm(range(0, permutationNumber)):
 	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
 	for j in range(0, numDocs*mult):

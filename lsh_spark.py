@@ -2,7 +2,10 @@ from pyspark.ml.feature import MinHashLSH
 from pyspark.ml.linalg import Vectors
 from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
+from pyspark import SparkContext, SparkConf
 spark = SparkSession.builder.appName('lsh_spark').getOrCreate()
+conf = SparkConf().setAppName("lsh").setMaster(master)
+sc = SparkContext(conf=conf)
 
 from tqdm import tqdm
 import numpy as np
@@ -95,8 +98,11 @@ for key,value in tqdm(matrix.items()):
 	data.append((key,Vectors.sparse(size,sorted(list(aux)),np.ones(len(list(aux))))))
 next_prime = sieve_of_eratosthenes(size*2,size)
 
+distData = sc.parallelize(data)
 
-df = spark.createDataFrame(data, ["id", "features"])
+#df = spark.createDataFrame(data, ["id", "features"])
+df = spark.createDataFrame(disData, ["id", "features"])
+
 key = Vectors.dense([1.0, 0.0])
 
 mh = MinHashLSH(inputCol="features", outputCol="hashes", numHashTables=5,  seed=next_prime)
