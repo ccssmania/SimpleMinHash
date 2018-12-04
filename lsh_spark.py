@@ -4,8 +4,7 @@ from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
 from pyspark import SparkContext, SparkConf
 spark = SparkSession.builder.appName('lsh_spark').getOrCreate()
-conf = SparkConf().setAppName("lsh").setMaster(master)
-sc = SparkContext(conf=conf)
+
 
 from tqdm import tqdm
 import numpy as np
@@ -97,11 +96,11 @@ for key,value in tqdm(matrix.items()):
 		aux.append(sh)
 	data.append((key,Vectors.sparse(size,sorted(list(aux)),np.ones(len(list(aux))))))
 next_prime = sieve_of_eratosthenes(size*2,size)
-
+sc = spark.sparkContext
 distData = sc.parallelize(data)
 
 #df = spark.createDataFrame(data, ["id", "features"])
-df = spark.createDataFrame(disData, ["id", "features"])
+df = spark.createDataFrame(distData, ["id", "features"])
 
 key = Vectors.dense([1.0, 0.0])
 
