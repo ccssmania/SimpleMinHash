@@ -118,7 +118,7 @@ for i in tqdm(range(0, permutationNumber)):
 	arrayIndex = hasFunction(random.randint(1,101),random.randint(1,101), list(matrix))
 	for j in range(0, numDocs*mult):
 		signatureMatrix.setdefault(j,[])
-		for key, value in arrayIndex.iteritems():
+		for key, value in arrayIndex.items():
 			if(matrix[value].get(j)):
 				signatureMatrix[j].append(key)
 				break
